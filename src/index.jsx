@@ -22,20 +22,34 @@ function NumberInput(sources) {
       .startWith(props.value))
     .flatten();
 
+  const valid$ = value$
+    .map(v => !Number.isNaN(v))
+    .debug("valid");
+
+  const submit$ = value$
+    .filter(v => !Number.isNaN(v))
+    .map(value => sources.DOM
+      .select(".field-input")
+      .events("keydown")
+      .filter(e => e.code === "Enter")
+      .mapTo(value))
+    .flatten();
+
   const id = ++NumberInput._id;
 
   const vdom$ = props$
     .map(({label, value}) =>
       <div className="field-wrapper">
         <label for={id} className="field-label">{label}</label>
-        <input id={id} className="field-input" value={value} pattern="\d+" />
+        <input type="number" id={id} className="field-input" value={value} pattern="\d+" />
       </div>
     );
 
   return {
     DOM: vdom$,
     value: value$,
-    valid: value$.map(v => !Number.isNaN(v))
+    valid: valid$,
+    submit: submit$,
   };
 }
 NumberInput._id = 0;
@@ -49,31 +63,31 @@ function InputForm(sources) {
   const whiteInput = NumberInput.isolate({
     DOM,
     props: xs.of({
-      label: "Bianchi (2)",
+      label: "White (2)",
       value: 0,
     }),
   });
   const redInput = NumberInput.isolate({
     DOM,
     props: xs.of({
-      label: "Rossi (3)",
+      label: "Red (3)",
       value: 0,
     }),
   });
   const blackInput = NumberInput.isolate({
     DOM,
     props: xs.of({
-      label: "Neri (4)",
+      label: "Black (4)",
       value: 0,
     }),
   });
-  //const targetInput = NumberInput.isolate({
-  //  DOM,
-  //  props: xs.of({
-  //    label: "Successi richiesti",
-  //    value: 0,
-  //  }),
-  //});
+
+  const enter$ = xs
+    .merge(whiteInput.submit, redInput.submit, blackInput.submit);
+
+  const click$ = sources.DOM
+    .select(".form-submit")
+    .events("click");
   
   const value$ = xs
     .combine(whiteInput.value, redInput.value, blackInput.value)
@@ -88,9 +102,8 @@ function InputForm(sources) {
     .flatten();
 
   const submit$ = value$
-    .map(value => sources.DOM
-      .select(".form-submit")
-      .events("click")
+    .map(value => xs
+      .merge(enter$, click$)
       .mapTo(value))
     .flatten();
 
@@ -148,8 +161,8 @@ function Result(sources) {
         <table>
           <tr>
             <th>k</th>
-            <th>=k</th>
-            <th>≥k</th>
+            <th className="table-header-eq">=k</th>
+            <th className="table-header-ge">≥k</th>
           </tr>
           {results.map(([p, P], k) =>
           <tr>
