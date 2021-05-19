@@ -177,7 +177,7 @@ function Graph(sources) {
       .updates()
       .map(tick => {
         const hLegend = graph.height / 32;
-        const pLegend = hLegend / 3;
+        const pLegend = hLegend / 4;
 
         const W = graph.width;
         const H = graph.height - hLegend;
@@ -221,7 +221,7 @@ function Graph(sources) {
             <line stroke="gray" x={0} y={H+hLegend} w={W} h={0} />
             
             <group
-              textAlign="center" textBaseline="top" font={`${hLegend}px monospace`}
+              textAlign="center" textBaseline="top" font={`${hLegend |0}px monospace`}
               fill="darkblue" x={x0} y={y0+pLegend}>
               {result.map((_, k) => (
                 <text text={k} x={k*dx} y={0} />
