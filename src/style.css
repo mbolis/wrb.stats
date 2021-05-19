@@ -4,6 +4,8 @@ body {
 }
 .content {
 	display: inline-block;
+        width: 100%;
+        max-width: 640px;
 }
 .form-row {
 	display: flex;
