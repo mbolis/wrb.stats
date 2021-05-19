@@ -71,3 +71,11 @@ th,
 td {
 	border: 1px solid silver;
 }
+.table-header-eq {
+	background: lightgreen;
+	color: darkgreen;
+}
+.table-header-ge {
+	background: #ffeda9;
+	color: #b50;
+}
